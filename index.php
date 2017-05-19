@@ -40,10 +40,10 @@
             <div class="col-lg-8 col-lg-offset-2">
                 <h2>About Me</h2>
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-3 col-md-3 col-sm-3">
                         <img alt="me" src="img/profile.png" class="img img-responsive">
                     </div>
-                    <div class="col-lg-9">
+                    <div class="col-lg-9 col-md-9 col-sm-9">
                         <p>My name is Saranpong (Nat). I'm a developer at Bangkok Airways. I live in Bangkok. This is my website. </p>
                         <p>My work is about coding, analyze a problem and find solution with the teams. learn a new technology and new things.</p>
                     </div>
@@ -58,15 +58,15 @@
             <div class="col-lg-8 col-lg-offset-2">
                 <h2>Portfolio</h2>
                 <?php
-                    for ($i=1; $i<=25; $i++)
+                    for ($i=0; $i<=24; $i++)
                     {
-                        if ($i%3==0)
-                            echo '<div class="row">';
-                        echo '<div class="col-lg-4">
-                                <img class="img img-responsive" alt="my work" src="work/work',$i,'.png">
+                        //if ($i%3==0)
+                        //    echo '<div class="row">';
+                        echo '<div class="col-lg-4 col-md-6 col-sm-6">
+                                <img class="img img-responsive" alt="my work" src="work/work',($i+1),'.png">
                             </div>';
-                        if ($i%3==0)
-                            echo '</div>';
+                        //if ($i%3==0)
+                        //    echo '</div>';
                     }
                 ?>
             </div>
@@ -81,7 +81,7 @@
                 <p>You can contact me via the following channel</p>
                 <ul class="list-inline banner-social-buttons">
                     <li>
-                        <a target="_blank" href="https://twitter.com/inat" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                        <a target="_blank" href="https://www.linkedin.com/in/forgetz/" class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Linkedin</span></a>
                     </li>
                     <li>
                         <a target="_blank" href="https://github.com/forgetz" class="btn btn-default btn-lg"><i class="fa fa-github fa-fw"></i> <span class="network-name">Github</span></a>

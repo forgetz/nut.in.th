@@ -1,0 +1,42 @@
+<html>
+<head>
+</head>
+<body>
+<form method="POST" action="">
+
+<script type="text/javascript" src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script type="text/javascript">
+	function showRecaptcha() {
+		Recaptcha.create("6Ld7-ugSAAAAAPnmq6UX7ezGLIzylVl2H5jEB5Y7", 'captchadiv', {
+			tabindex: 1,
+			theme: "black",
+			callback: Recaptcha.focus_response_field
+		});
+	}
+	function subcap()
+	{
+		var challenge = Recaptcha.get_challenge();
+		var response = Recaptcha.get_response();
+		var pvkey = "6Ld7-ugSAAAAAN6PCxrR2KvjOKRxQ1iHfsO3QpHS";
+		var remoteip = "::1";
+		$.post("http://www.google.com/recaptcha/api/verify", {
+			privatekey: pvkey
+			, remoteip: remoteip
+			, challenge: challenge
+			, response: response
+		}, function (data) {
+			alert(data);
+		});
+	}
+</script>
+
+<div id="captchadiv"></div>
+
+<input type="button" value="Click Me" onclick="showRecaptcha();">
+<input type="button" name="Button1" value="Submit" onclick="subcap();">
+
+</form>
+
+</body>
+</html>
