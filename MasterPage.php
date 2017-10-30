@@ -3,7 +3,7 @@
  class MasterPage 
  {
 
- 	public static function Header()
+ 	public static function Header($title = "")
  	{
  		echo '
 <!DOCTYPE html>
