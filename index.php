@@ -60,13 +60,9 @@
                 <?php
                     for ($i=0; $i<=24; $i++)
                     {
-                        //if ($i%3==0)
-                        //    echo '<div class="row">';
                         echo '<div class="col-lg-4 col-md-6 col-sm-6">
                                 <img class="img img-responsive" alt="my work" src="work/work',($i+1),'.png">
                             </div>';
-                        //if ($i%3==0)
-                        //    echo '</div>';
                     }
                 ?>
             </div>
