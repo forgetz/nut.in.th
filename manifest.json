@@ -1,0 +1,15 @@
+{
+  "name": "Nut.in.th Website",
+  "short_name": "nut.in.th website",
+  "display": "minimal-ui",
+  "start_url": "/",
+  "theme_color": "#673ab6",
+  "background_color": "#111111",
+  "icons": [
+    {
+      "src": "logo_n.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
