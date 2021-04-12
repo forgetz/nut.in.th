@@ -93,9 +93,11 @@
                 <h2>Contact Me</h2>
                 <p>You can contact me via the following channel</p>
                 <ul class="list-inline banner-social-buttons">
-                    <li>
-                        <a target="_blank" href="https://linkedin.com/in/forgetz/" class="btn btn-default btn-lg btn-circle"><i class="fab fa-linkedin-in"></i><span class="network-name"></span></a>
-                    </li>
+                    <?
+					//<li>
+                    //    <a target="_blank" href="https://linkedin.com/in/forgetz/" class="btn btn-default btn-lg btn-circle"><i class="fab fa-linkedin-in"></i><span class="network-name"></span></a>
+                    //</li>
+					?>
                     <li>
                         <a target="_blank" href="https://github.com/forgetz" class="btn btn-default btn-lg btn-circle"><i class="fab fa-github"></i><span class="network-name"></span></a>
                     </li>
@@ -108,11 +110,7 @@
 					
                 </ul>
             </div>
-			<div class="col-lg-8 col-lg-offset-2">
-				<a href="#intro" class="btn btn-circle page-scroll">
-					<i class="fa fa-angle-double-up animated"></i>
-				</a>
-			</div>
+
         </div>
     </section>
 
