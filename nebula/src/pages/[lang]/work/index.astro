@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProjectList from '../../../components/ProjectList.astro';
+import { langs, useT, type Lang } from '../../../i18n/ui';
+import { getProjects } from '../../../lib/content';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useT(lang);
+const projects = await getProjects(lang);
+---
+
+<BaseLayout lang={lang} title={t('work.allTitle')}>
+  <section class="page">
+    <div class="container">
+      <header class="page-head">
+        <h1 class="enter">{t('work.allTitle')}</h1>
+        <p class="secondary enter" style="--i:1">
+          {t('work.allLead')} <span class="mono muted">· {projects.length}</span>
+        </p>
+      </header>
+      <ProjectList lang={lang} projects={projects} />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--s-16) var(--s-24);
+  }
+  .page-head {
+    margin-bottom: var(--s-12);
+  }
+  h1 {
+    font-size: clamp(2rem, 1.4rem + 2vw, 2.5rem);
+    letter-spacing: -0.02em;
+  }
+  .page-head p {
+    margin-top: var(--s-3);
+    font-size: var(--fs-18);
+  }
+</style>

@@ -1,0 +1,158 @@
+---
+// Work shown as a log: screenshot · title + summary · client / kind / year.
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { localizePath, type Lang } from '../i18n/ui';
+import type { Project } from '../lib/content';
+
+interface Props {
+  lang: Lang;
+  projects: Project[];
+}
+const { lang, projects } = Astro.props;
+---
+
+<ol class="log" role="list">
+  {
+    projects.map((p, i) => (
+      <li class="enter" style={`--i:${Math.min(i, 5)}`}>
+        <a class="row" href={localizePath(lang, `/work/${p.slug}/`)}>
+          <span class="thumb">
+            {p.data.cover ? (
+              <Image src={p.data.cover} alt="" widths={[160, 320]} sizes="160px" format="webp" quality={70} loading="lazy" />
+            ) : (
+              <svg class="glyph" viewBox="0 0 20 20" aria-hidden="true">
+                <circle cx="10" cy="10" r="9" fill="currentColor" />
+                <circle cx="12.5" cy="7.5" r="3" fill="var(--raised)" />
+              </svg>
+            )}
+          </span>
+          <span class="main">
+            <span class="title">{p.data.title}</span>
+            <span class="summary secondary">{p.data.summary}</span>
+          </span>
+          <span class="meta">
+            {p.data.client && <span class="secondary">{p.data.client}</span>}
+            <span class="muted">{[p.data.kind ?? p.data.role, p.data.stack.length ? p.data.stack.join(' · ') : null].filter(Boolean).join(' · ')}</span>
+            <span class="mono muted">{p.data.year}</span>
+          </span>
+          <Icon name="arrow-right" class="arrow" />
+        </a>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  li {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr) minmax(0, 240px) 18px;
+    align-items: center;
+    gap: var(--s-6);
+    padding: var(--s-4);
+    margin-inline: calc(var(--s-4) * -1);
+    border-radius: var(--r-card);
+    text-decoration: none;
+    transition: background-color var(--t-fast) var(--ease);
+  }
+
+  .row:hover {
+    background: var(--raised);
+  }
+
+  .thumb {
+    display: block;
+    aspect-ratio: 16 / 10;
+    border-radius: var(--r-control);
+    overflow: hidden;
+    background: var(--raised);
+    border: 1px solid var(--line);
+  }
+
+  .thumb:has(.glyph) {
+    display: grid;
+    place-items: center;
+    color: var(--text-3);
+  }
+
+  .glyph {
+    width: 24px;
+    height: 24px;
+  }
+
+  .thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+
+  .main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-1);
+  }
+
+  .title {
+    font-size: var(--fs-18);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  .summary {
+    font-size: var(--fs-15);
+    line-height: 1.5;
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: var(--fs-13);
+    line-height: 1.5;
+  }
+
+  .row :global(.arrow) {
+    color: var(--text-3);
+    transition: color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  }
+
+  .row:hover :global(.arrow) {
+    color: var(--accent);
+    transform: translateX(2px);
+  }
+
+  @media (max-width: 860px) {
+    .row {
+      grid-template-columns: 112px minmax(0, 1fr);
+      align-items: start;
+      gap: var(--s-2) var(--s-4);
+    }
+    .thumb {
+      grid-row: 1 / span 2;
+    }
+    .title {
+      font-size: var(--fs-16);
+    }
+    .summary {
+      display: none;
+    }
+    .meta {
+      grid-column: 2;
+    }
+    .row :global(.arrow) {
+      display: none;
+    }
+  }
+</style>

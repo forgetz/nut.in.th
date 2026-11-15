@@ -1,0 +1,254 @@
+---
+// Responsive image grid + a <dialog> viewer. Thumbnails and full-size files are WebP made at build time.
+import { Image, getImage } from 'astro:assets';
+import Icon from './Icon.astro';
+import { useT, type Lang } from '../i18n/ui';
+import type { GalleryItem } from '../lib/gallery';
+
+interface Props {
+  lang: Lang;
+  items: GalleryItem[];
+  /** Eager-load the first N thumbnails */
+  eager?: number;
+}
+const { lang, items, eager = 0 } = Astro.props;
+const t = useT(lang);
+
+const withFull = await Promise.all(
+  items.map(async (item) => {
+    const full = await getImage({ src: item.image, width: Math.min(item.image.width, 2400), format: 'webp', quality: 85 });
+    return { ...item, full: full.src };
+  }),
+);
+---
+
+<ul class="grid" role="list">
+  {
+    withFull.map((item, i) => (
+      <li>
+        <a
+          class="tile"
+          href={item.full}
+          data-index={i}
+          data-title={item.title}
+          data-description={item.description}
+          aria-label={item.title || `${t('gallery.image')} ${i + 1}`}
+        >
+          <Image
+            src={item.image}
+            alt={item.title}
+            widths={[360, 560, 840]}
+            sizes="(max-width: 560px) 50vw, (max-width: 1024px) 33vw, 280px"
+            format="webp"
+            quality={78}
+            loading={i < eager ? 'eager' : 'lazy'}
+          />
+        </a>
+        {item.title && <p class="cap">{item.title}</p>}
+      </li>
+    ))
+  }
+</ul>
+
+<dialog class="viewer" aria-label={t('gallery.title')}>
+  <figure>
+    <img alt="" />
+    <figcaption>
+      <span class="v-title"></span>
+      <span class="v-desc secondary"></span>
+      <span class="v-count mono muted"></span>
+    </figcaption>
+  </figure>
+  <div class="controls">
+    <button type="button" class="prev" aria-label={t('gallery.prev')}><Icon name="arrow-left" /></button>
+    <button type="button" class="next" aria-label={t('gallery.next')}><Icon name="arrow-right" /></button>
+    <button type="button" class="close" aria-label={t('gallery.close')}><Icon name="x" /></button>
+  </div>
+</dialog>
+
+<script>
+  document.querySelectorAll<HTMLUListElement>('.grid').forEach((grid) => {
+    const dialog = grid.nextElementSibling as HTMLDialogElement | null;
+    if (!dialog || typeof dialog.showModal !== 'function') return;
+    const tiles = Array.from(grid.querySelectorAll<HTMLAnchorElement>('.tile'));
+    const img = dialog.querySelector('img')!;
+    const title = dialog.querySelector('.v-title')!;
+    const desc = dialog.querySelector('.v-desc')!;
+    const count = dialog.querySelector('.v-count')!;
+    let current = 0;
+
+    const show = (i: number) => {
+      current = (i + tiles.length) % tiles.length;
+      const tile = tiles[current];
+      img.src = tile.href;
+      img.alt = tile.dataset.title ?? '';
+      title.textContent = tile.dataset.title ?? '';
+      desc.textContent = tile.dataset.description ?? '';
+      count.textContent = `${current + 1} / ${tiles.length}`;
+    };
+
+    tiles.forEach((tile, i) =>
+      tile.addEventListener('click', (e) => {
+        e.preventDefault();
+        show(i);
+        dialog.showModal();
+      }),
+    );
+
+    dialog.querySelector('.prev')!.addEventListener('click', () => show(current - 1));
+    dialog.querySelector('.next')!.addEventListener('click', () => show(current + 1));
+    dialog.querySelector('.close')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (e) => {
+      if (e.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') show(current - 1);
+      if (e.key === 'ArrowRight') show(current + 1);
+    });
+    dialog.addEventListener('close', () => tiles[current]?.focus());
+  });
+</script>
+
+<style>
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    columns: 4 240px;
+    column-gap: var(--s-4);
+  }
+
+  li {
+    break-inside: avoid;
+    margin-bottom: var(--s-4);
+  }
+
+  .tile {
+    display: block;
+    border-radius: var(--r-card);
+    overflow: hidden;
+    background: var(--raised);
+    border: 1px solid var(--line);
+  }
+
+  .tile :global(img) {
+    width: 100%;
+    height: auto;
+    transition: opacity var(--t-fast) var(--ease);
+  }
+
+  .tile:hover :global(img) {
+    opacity: 0.9;
+  }
+
+  .cap {
+    margin-top: var(--s-2);
+    font-size: var(--fs-13);
+    color: var(--text-2);
+  }
+
+  @media (max-width: 560px) {
+    .grid {
+      columns: 2;
+      column-gap: var(--s-3);
+    }
+    li {
+      margin-bottom: var(--s-3);
+    }
+  }
+
+  /* Viewer */
+  .viewer {
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: var(--s-6);
+    border: 0;
+    background: rgb(10 11 12 / 0.96);
+    color: #ecedee;
+  }
+
+  .viewer::backdrop {
+    background: rgb(10 11 12 / 0.6);
+  }
+
+  .viewer[open] {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--s-4);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .viewer[open] {
+      animation: fade 200ms var(--ease);
+    }
+    @keyframes fade {
+      from {
+        opacity: 0;
+      }
+    }
+  }
+
+  figure {
+    margin: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    gap: var(--s-4);
+    justify-items: center;
+  }
+
+  figure img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    border-radius: var(--r-control);
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--s-1) var(--s-4);
+    font-size: var(--fs-15);
+    text-align: center;
+    max-width: 720px;
+  }
+
+  .viewer .secondary {
+    color: #a4a7ae;
+  }
+  .viewer .muted {
+    color: #868a92;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: var(--s-2);
+  }
+
+  .controls button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-control);
+    border: 1px solid rgb(236 237 238 / 0.14);
+    background: transparent;
+    color: #ecedee;
+    cursor: pointer;
+    transition: background-color var(--t-fast) var(--ease);
+  }
+
+  .controls button:hover {
+    background: rgb(236 237 238 / 0.08);
+  }
+
+  .controls .close {
+    margin-left: var(--s-4);
+  }
+</style>

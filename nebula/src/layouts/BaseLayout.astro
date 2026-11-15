@@ -1,0 +1,63 @@
+---
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/500.css';
+import '@fontsource/ibm-plex-sans-thai/400.css';
+import '@fontsource/ibm-plex-sans-thai/500.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '../styles/global.css';
+
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { useT, langs, switchLangPath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description?: string;
+  /** Hide the language alternates (e.g. 404 page). */
+  noAlternates?: boolean;
+}
+
+const { lang, title, description, noAlternates = false } = Astro.props;
+const t = useT(lang);
+const pageTitle = title ? `${title} · Nebula` : 'Nebula · nut.in.th';
+const desc = description ?? t('meta.description');
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogLocale = lang === 'th' ? 'th_TH' : 'en_US';
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={desc} />
+    <link rel="canonical" href={canonical} />
+    {
+      !noAlternates &&
+        langs.map((l) => (
+          <link rel="alternate" hreflang={l} href={new URL(switchLangPath(Astro.url.pathname, l), Astro.site)} />
+        ))
+    }
+    {!noAlternates && <link rel="alternate" hreflang="x-default" href={new URL(switchLangPath(Astro.url.pathname, 'th'), Astro.site)} />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#111214" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Nebula" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <slot name="head" />
+  </head>
+  <body>
+    <Header lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

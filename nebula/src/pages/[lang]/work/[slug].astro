@@ -1,0 +1,196 @@
+---
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Icon from '../../../components/Icon.astro';
+import { langs, useT, localizePath, type Lang } from '../../../i18n/ui';
+import { getProjects, type Project } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const lang of langs) {
+    for (const project of await getProjects(lang)) {
+      paths.push({ params: { lang, slug: project.slug }, props: { project } });
+    }
+  }
+  return paths;
+}
+
+const lang = Astro.params.lang as Lang;
+const { project } = Astro.props as { project: Project };
+const t = useT(lang);
+const { Content } = await render(project);
+const d = project.data;
+---
+
+<BaseLayout lang={lang} title={d.title} description={d.summary}>
+  <article class="page">
+    <div class="container">
+      <a class="back" href={localizePath(lang, '/work/')}>
+        <Icon name="arrow-left" size={16} />
+        {t('work.back')}
+      </a>
+
+      <header class="head">
+        <h1 class="enter">{d.title}</h1>
+        <p class="lead secondary enter" style="--i:1">{d.summary}</p>
+      </header>
+
+      <dl class="facts enter" style="--i:2">
+        <div>
+          <dt class="muted">{t('work.year')}</dt>
+          <dd class="mono">{d.year}</dd>
+        </div>
+        {
+          d.client && (
+            <div>
+              <dt class="muted">{t('work.client')}</dt>
+              <dd>{d.client}</dd>
+            </div>
+          )
+        }
+        {
+          d.kind && (
+            <div>
+              <dt class="muted">{t('work.kind')}</dt>
+              <dd>{d.kind}</dd>
+            </div>
+          )
+        }
+        {
+          d.role && (
+            <div>
+              <dt class="muted">{t('work.role')}</dt>
+              <dd>{d.role}</dd>
+            </div>
+          )
+        }
+        {
+          d.stack.length > 0 && (
+            <div>
+              <dt class="muted">{t('work.stack')}</dt>
+              <dd class="mono">{d.stack.join(' · ')}</dd>
+            </div>
+          )
+        }
+        {
+          d.link && (
+            <div>
+              <dt class="visually-hidden">Link</dt>
+              <dd>
+                <a class="btn btn-quiet btn-sm" href={d.link} target="_blank" rel="noopener">
+                  {t('work.visit')}
+                  <Icon name="arrow-up-right" size={16} />
+                </a>
+              </dd>
+            </div>
+          )
+        }
+      </dl>
+
+      {d.cover && <Image class="cover" src={d.cover} alt={d.coverAlt ?? ''} widths={[720, 1120, 1600]} sizes="(max-width: 1184px) 100vw, 1120px" />}
+
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--s-12) var(--s-24);
+  }
+
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-size: var(--fs-15);
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  .back:hover {
+    color: var(--text);
+  }
+
+  .head {
+    margin-top: var(--s-10);
+    max-width: 800px;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 1.3rem + 2.4vw, 3rem);
+    letter-spacing: -0.02em;
+  }
+
+  .lead {
+    margin-top: var(--s-4);
+    font-size: var(--fs-20);
+    line-height: 1.5;
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--s-6) var(--s-12);
+    margin: var(--s-10) 0 0;
+    padding-block: var(--s-6);
+    border-block: 1px solid var(--line);
+  }
+
+  .facts dt {
+    font-size: var(--fs-12);
+    margin-bottom: var(--s-1);
+  }
+
+  .facts dd {
+    margin: 0;
+    font-size: var(--fs-15);
+  }
+
+  /* Old screenshots are small: show them at natural size, never upscaled */
+  .cover {
+    margin-top: var(--s-12);
+    width: auto;
+    max-width: 100%;
+    border-radius: var(--r-card);
+    border: 1px solid var(--line);
+  }
+
+  .prose {
+    max-width: var(--prose);
+    margin-top: var(--s-12);
+    font-size: var(--fs-18);
+    line-height: 1.75;
+    color: var(--text-2);
+  }
+
+  .prose :global(h2) {
+    margin: var(--s-12) 0 var(--s-4);
+    font-size: var(--fs-20);
+    color: var(--text);
+  }
+
+  .prose :global(p + p),
+  .prose :global(ul),
+  .prose :global(ol) {
+    margin-top: var(--s-4);
+  }
+
+  .prose :global(li + li) {
+    margin-top: var(--s-2);
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+  }
+
+  @media (max-width: 720px) {
+    .prose,
+    .lead {
+      font-size: var(--fs-16);
+    }
+  }
+</style>

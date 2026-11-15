@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { langs, useT, type Lang } from '../../i18n/ui';
+import { subSites } from '../../data/sites';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useT(lang);
+---
+
+<BaseLayout lang={lang} title={t('sites.title')} description={t('sites.lead')}>
+  <section class="page">
+    <div class="container">
+      <header class="page-head">
+        <h1 class="enter">{t('sites.title')}</h1>
+        <p class="secondary enter" style="--i:1">
+          {t('sites.lead')} <span class="mono muted">· {subSites.length}</span>
+        </p>
+      </header>
+
+      <ul class="sites" role="list">
+        {
+          subSites.map((s, i) => (
+            <li class="enter" style={`--i:${Math.min(i + 2, 5)}`}>
+              <a class="site" href={`https://${s.host}/`} rel="noopener">
+                <span class="top">
+                  <span class="name">{s.name}</span>
+                  <Icon name="arrow-up-right" class="arrow" />
+                </span>
+                <span class="host mono">{s.host}</span>
+                <span class="desc secondary">{s.description[lang]}</span>
+                {s.status === 'wip' && <span class="status muted">{t('sites.wip')}</span>}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--s-16) var(--s-24);
+  }
+  .page-head {
+    margin-bottom: var(--s-10);
+    max-width: 760px;
+  }
+  h1 {
+    font-size: clamp(2rem, 1.4rem + 2vw, 2.5rem);
+    letter-spacing: -0.02em;
+  }
+  .page-head p {
+    margin-top: var(--s-3);
+    font-size: var(--fs-18);
+  }
+
+  .sites {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: var(--s-4);
+  }
+
+  .site {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    height: 100%;
+    padding: var(--s-6);
+    border-radius: var(--r-card);
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    transition: background-color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
+  }
+
+  .site:hover {
+    background: var(--raised);
+    border-color: var(--line-strong);
+  }
+
+  .top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+  }
+
+  .name {
+    font-size: var(--fs-20);
+    font-weight: 500;
+  }
+
+  .site :global(.arrow) {
+    color: var(--text-3);
+    transition: color var(--t-fast) var(--ease), transform var(--t-fast) var(--ease);
+  }
+
+  .site:hover :global(.arrow) {
+    color: var(--accent);
+    transform: translate(2px, -2px);
+  }
+
+  .host {
+    font-size: var(--fs-13);
+    color: var(--accent);
+  }
+
+  .desc {
+    margin-top: var(--s-2);
+    font-size: var(--fs-15);
+    line-height: 1.55;
+  }
+
+  .status {
+    margin-top: auto;
+    padding-top: var(--s-3);
+    font-size: var(--fs-12);
+  }
+</style>

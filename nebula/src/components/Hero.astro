@@ -1,0 +1,164 @@
+---
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { useT, localizePath, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+
+// Drop a photo at src/assets/hero-nebula.(jpg|png|webp) and it is picked up automatically.
+const found = import.meta.glob<{ default: ImageMetadata }>('../assets/hero-nebula.{jpg,jpeg,png,webp}', {
+  eager: true,
+});
+const photo = Object.values(found)[0]?.default;
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  {
+    photo && (
+      <Image
+        class="photo"
+        src={photo}
+        alt=""
+        widths={[960, 1600, 2400]}
+        sizes="100vw"
+        loading="eager"
+        fetchpriority="high"
+        format="webp"
+        quality={78}
+      />
+    )
+  }
+  <div class="container inner">
+    <div class="copy">
+      <p class="eyebrow mono enter" style="--i:0">{t('hero.eyebrow')}</p>
+      <h1 id="hero-title" class="enter" style="--i:1">{t('hero.title')}</h1>
+      <p class="lead enter" style="--i:2">{t('hero.lead')}</p>
+      <div class="actions enter" style="--i:3">
+        <a class="btn btn-primary" href={localizePath(lang, '/work/')}>
+          {t('hero.primary')}
+          <Icon name="arrow-right" />
+        </a>
+        <a class="btn btn-ghost" href={localizePath(lang, '/#contact')}>{t('hero.secondary')}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The hero is always dark: it sits on the night sky regardless of color scheme. */
+  .hero {
+    --hero-text: #f1f2f3;
+    --hero-text-2: #b9bcc2;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    min-height: calc(100svh - 61px);
+    background: #0c0d0f;
+    color: var(--hero-text);
+    overflow: hidden;
+  }
+
+  .photo {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 70% 50%;
+  }
+
+  /* Neutral scrim (no hue) so the text side stays readable on any photo */
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(90deg, rgb(12 13 15 / 0.82) 0%, rgb(12 13 15 / 0.55) 45%, rgb(12 13 15 / 0) 80%);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    padding-block: var(--s-16) var(--s-24);
+  }
+
+  .copy {
+    max-width: 640px;
+    /* sit a little above the optical middle */
+    transform: translateY(-4vh);
+  }
+
+  .eyebrow {
+    font-size: var(--fs-13);
+    color: var(--hero-text-2);
+    margin-bottom: var(--s-6);
+  }
+
+  h1 {
+    font-size: var(--fs-hero);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+  }
+
+  :global(html[lang='th']) h1 {
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .lead {
+    margin-top: var(--s-6);
+    max-width: 52ch;
+    font-size: var(--fs-18);
+    line-height: 1.6;
+    color: var(--hero-text-2);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-10);
+  }
+
+  .btn-ghost {
+    color: var(--hero-text);
+    border-color: rgb(241 242 243 / 0.22);
+  }
+  .btn-ghost:hover {
+    background: rgb(241 242 243 / 0.08);
+  }
+
+  /* On dark the accent button uses the dark-theme accent for contrast */
+  .hero .btn-primary {
+    background: #5cc6d2;
+    color: #0b1214;
+  }
+  .hero .btn-primary:hover {
+    background: #7fd4dd;
+  }
+
+  @media (max-width: 720px) {
+    .hero::before {
+      background: linear-gradient(180deg, rgb(12 13 15 / 0.35) 0%, rgb(12 13 15 / 0.85) 70%);
+    }
+    .inner {
+      align-items: flex-end;
+      padding-block: var(--s-16) var(--s-12);
+    }
+    .copy {
+      transform: none;
+    }
+    .lead {
+      font-size: var(--fs-16);
+    }
+    .actions .btn {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+  }
+</style>

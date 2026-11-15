@@ -1,0 +1,225 @@
+---
+import Wordmark from './Wordmark.astro';
+import Icon from './Icon.astro';
+import { useT, localizePath, switchLangPath, otherLang, languages, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  /** Pathname of the same page in the other language, if it differs from a simple prefix swap. */
+  altPath?: string;
+}
+const { lang, altPath } = Astro.props;
+const t = useT(lang);
+const other = otherLang(lang);
+const switchHref = altPath ?? switchLangPath(Astro.url.pathname, other);
+const path = Astro.url.pathname;
+
+const links = [
+  { href: localizePath(lang, '/work/'), label: t('nav.work'), active: path.startsWith(localizePath(lang, '/work/')) },
+  { href: localizePath(lang, '/gallery/'), label: t('nav.gallery'), active: path.startsWith(localizePath(lang, '/gallery/')) },
+  { href: localizePath(lang, '/sites/'), label: t('nav.sites'), active: path.startsWith(localizePath(lang, '/sites/')) },
+  { href: localizePath(lang, '/#about'), label: t('nav.about'), active: false },
+];
+---
+
+<header class="site-header">
+  <a class="skip" href="#main">{t('nav.skip')}</a>
+  <div class="container bar">
+    <Wordmark href={localizePath(lang, '/')} />
+
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <ul>
+        {
+          links.map((l) => (
+            <li>
+              <a href={l.href} aria-current={l.active ? 'page' : undefined}>
+                {l.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href={switchHref} hreflang={other} lang={other} class="lang">
+            <Icon name="languages" size={16} />
+            {languages[other]}
+          </a>
+        </li>
+      </ul>
+      <a class="btn btn-primary btn-sm" href={localizePath(lang, '/#contact')}>{t('nav.contact')}</a>
+    </nav>
+
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="site-nav" data-open={t('nav.menu')} data-close={t('nav.close')}>
+      <span class="icon-open"><Icon name="menu" /></span>
+      <span class="icon-close"><Icon name="x" /></span>
+      <span class="visually-hidden label">{t('nav.menu')}</span>
+    </button>
+  </div>
+</header>
+
+<script>
+  try {
+    localStorage.setItem('nebula-lang', document.documentElement.lang);
+  } catch {}
+  const btn = document.querySelector<HTMLButtonElement>('.menu-btn');
+  const header = document.querySelector('.site-header');
+  const label = btn?.querySelector('.label');
+  btn?.addEventListener('click', () => {
+    const open = btn.getAttribute('aria-expanded') !== 'true';
+    btn.setAttribute('aria-expanded', String(open));
+    header?.classList.toggle('is-open', open);
+    if (label) label.textContent = open ? btn.dataset.close! : btn.dataset.open!;
+  });
+  document.querySelectorAll('#site-nav a').forEach((a) =>
+    a.addEventListener('click', () => {
+      btn?.setAttribute('aria-expanded', 'false');
+      header?.classList.remove('is-open');
+    }),
+  );
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--page) 92%, transparent);
+    backdrop-filter: saturate(140%) blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .skip {
+    position: absolute;
+    left: var(--s-4);
+    top: -48px;
+    padding: var(--s-2) var(--s-3);
+    background: var(--card);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-control);
+    font-size: var(--fs-13);
+  }
+  .skip:focus {
+    top: var(--s-2);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    gap: var(--s-6);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--s-6);
+  }
+
+  .nav ul {
+    display: flex;
+    align-items: center;
+    gap: var(--s-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav ul a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    height: 34px;
+    padding-inline: var(--s-3);
+    border-radius: var(--r-control);
+    font-size: var(--fs-15);
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color var(--t-fast) var(--ease), background-color var(--t-fast) var(--ease);
+  }
+
+  .nav ul a:hover {
+    color: var(--text);
+    background: var(--raised);
+  }
+
+  .nav ul a[aria-current='page'] {
+    color: var(--text);
+    box-shadow: inset 0 -2px 0 var(--accent);
+    border-radius: 0;
+  }
+
+  .menu-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    margin-right: calc(var(--s-2) * -1);
+    border: 0;
+    border-radius: var(--r-control);
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .menu-btn:hover {
+    background: var(--raised);
+  }
+  .menu-btn span {
+    display: inline-flex;
+  }
+  .icon-close {
+    display: none !important;
+  }
+  .is-open .icon-close {
+    display: inline-flex !important;
+  }
+  .is-open .icon-open {
+    display: none !important;
+  }
+
+  @media (max-width: 720px) {
+    .menu-btn {
+      display: inline-flex;
+    }
+
+    .nav {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--s-4);
+      padding: var(--s-4) var(--gutter) var(--s-6);
+      background: var(--page);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .is-open .nav {
+      display: flex;
+    }
+
+    .nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--s-1);
+    }
+
+    .nav ul a {
+      height: 44px;
+      font-size: var(--fs-16);
+      padding-inline: var(--s-2);
+    }
+
+    .nav ul a[aria-current='page'] {
+      box-shadow: inset 2px 0 0 var(--accent);
+    }
+
+    .nav .btn {
+      justify-content: center;
+      height: 44px;
+      font-size: var(--fs-15);
+    }
+  }
+</style>

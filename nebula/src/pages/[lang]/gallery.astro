@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import GalleryGrid from '../../components/GalleryGrid.astro';
+import { langs, useT, type Lang } from '../../i18n/ui';
+import { getGallery } from '../../lib/gallery';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useT(lang);
+const items = getGallery(lang);
+---
+
+<BaseLayout lang={lang} title={t('gallery.title')} description={t('gallery.lead')}>
+  <section class="page">
+    <div class="container">
+      <header class="page-head">
+        <h1 class="enter">{t('gallery.title')}</h1>
+        <p class="secondary enter" style="--i:1">
+          {t('gallery.lead')} <span class="mono muted">· {items.length}</span>
+        </p>
+      </header>
+      {items.length ? <GalleryGrid lang={lang} items={items} eager={8} /> : <p class="muted empty">{t('gallery.empty')}</p>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--s-16) var(--s-24);
+  }
+  .page-head {
+    margin-bottom: var(--s-10);
+    max-width: 760px;
+  }
+  h1 {
+    font-size: clamp(2rem, 1.4rem + 2vw, 2.5rem);
+    letter-spacing: -0.02em;
+  }
+  .page-head p {
+    margin-top: var(--s-3);
+    font-size: var(--fs-18);
+  }
+  .empty {
+    padding-block: var(--s-16);
+    border-top: 1px solid var(--line);
+  }
+</style>

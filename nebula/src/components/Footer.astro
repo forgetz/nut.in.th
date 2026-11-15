@@ -1,0 +1,66 @@
+---
+import { useT, localizePath, site, type Lang } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = useT(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container row">
+    <p class="muted">
+      <span class="mono">© {year}</span> {site.owner} · nut.in.th
+    </p>
+    <nav aria-label="Legal">
+      <a href={localizePath(lang, '/terms/')}>{t('footer.terms')}</a>
+      <a href={localizePath(lang, '/privacy/')}>{t('footer.privacy')}</a>
+    </nav>
+    {site.heroCredit[lang] && <p class="muted credit">{site.heroCredit[lang]}</p>}
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding-block: var(--s-8);
+    font-size: var(--fs-13);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-3) var(--s-8);
+  }
+
+  nav {
+    display: flex;
+    gap: var(--s-6);
+  }
+
+  nav a {
+    color: var(--text-2);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--text);
+  }
+
+  .credit {
+    margin-left: auto;
+  }
+
+  @media (max-width: 720px) {
+    .row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .credit {
+      margin-left: 0;
+    }
+  }
+</style>

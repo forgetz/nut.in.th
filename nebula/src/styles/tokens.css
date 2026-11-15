@@ -1,0 +1,84 @@
+/* Design tokens — unslop rules: one ink neutral ramp, three text roles, one accent,
+   4px spacing scale, nested radii, one easing curve. */
+:root {
+  color-scheme: light dark;
+
+  /* Ink ramp — light */
+  --page: #fafafa;
+  --card: #ffffff;
+  --raised: #f2f3f5;
+  --text: #16171a;
+  --text-2: #50535a;
+  --text-3: #6b6f77;
+  --line: rgb(22 23 26 / 0.08);
+  --line-strong: rgb(22 23 26 / 0.14);
+
+  /* One accent (cool, from the observatory world) */
+  --accent: #0e7490;        /* text/links on light: 5.4:1 on white */
+  --accent-strong: #0b5f75;
+  --on-accent: #ffffff;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.05);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.06);
+
+  /* Type */
+  --font-sans: 'IBM Plex Sans', 'IBM Plex Sans Thai', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --fs-12: 0.75rem;   /* 12/16 */
+  --fs-13: 0.8125rem; /* 13/20 */
+  --fs-15: 0.9375rem; /* 15/22 */
+  --fs-16: 1rem;
+  --fs-18: 1.125rem;
+  --fs-20: 1.25rem;
+  --fs-32: 2rem;
+  --fs-hero: clamp(2.375rem, 1.2rem + 4.4vw, 4.25rem); /* 38 -> 68 */
+
+  /* Spacing — 4px grid */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-20: 80px;
+  --s-24: 96px;
+  --s-32: 128px;
+
+  --gutter: clamp(16px, 4vw, 32px);
+  --content: 1120px;
+  --prose: 680px;
+
+  /* Radii */
+  --r-tag: 6px;
+  --r-control: 8px;
+  --r-card: 14px;
+
+  /* Motion */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --t-fast: 150ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #111214;
+    --card: #17181b;
+    --raised: #202125;
+    --text: #ecedee;
+    --text-2: #a4a7ae;
+    --text-3: #868a92;
+    --line: rgb(236 237 238 / 0.08);
+    --line-strong: rgb(236 237 238 / 0.14);
+
+    --accent: #5cc6d2;
+    --accent-strong: #7fd4dd;
+    --on-accent: #0b1214;
+
+    --shadow-sm: none;
+    --shadow-md: none;
+  }
+}

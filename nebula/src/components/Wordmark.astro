@@ -1,0 +1,31 @@
+---
+// Flat wordmark: one solid glyph (a disc with an offset core, like a nebula's bright knot) + the name.
+interface Props {
+  href: string;
+}
+const { href } = Astro.props;
+---
+
+<a class="wordmark" href={href} aria-label="Nebula — nut.in.th">
+  <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+    <circle cx="10" cy="10" r="9" fill="currentColor" />
+    <circle cx="12.5" cy="7.5" r="3" fill="var(--page)" />
+  </svg>
+  <span>Nebula</span>
+</a>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-size: var(--fs-18);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    color: var(--text);
+  }
+  svg {
+    flex: none;
+  }
+</style>

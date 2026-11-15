@@ -1,0 +1,35 @@
+---
+// Root of nut.in.th: send visitors to their language. Thai is the default.
+---
+
+<!doctype html>
+<html lang="th">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nebula · nut.in.th</title>
+    <meta name="robots" content="noindex, follow" />
+    <link rel="canonical" href="https://nut.in.th/th/" />
+    <link rel="alternate" hreflang="th" href="https://nut.in.th/th/" />
+    <link rel="alternate" hreflang="en" href="https://nut.in.th/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://nut.in.th/th/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <script is:inline>
+      (function () {
+        var saved = null;
+        try { saved = localStorage.getItem('nebula-lang'); } catch (e) {}
+        var nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'th';
+        var lang = saved || (/^th\b/i.test(nav) ? 'th' : 'en');
+        location.replace('/' + lang + '/' + location.hash);
+      })();
+    </script>
+    <meta http-equiv="refresh" content="1; url=/th/" />
+    <style>
+      body { margin: 0; font: 16px/1.6 system-ui, sans-serif; background: #111214; color: #a4a7ae; display: grid; place-items: center; min-height: 100vh; }
+      a { color: #ecedee; }
+    </style>
+  </head>
+  <body>
+    <p><a href="/th/">ไทย</a> · <a href="/en/">English</a></p>
+  </body>
+</html>

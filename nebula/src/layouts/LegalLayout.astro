@@ -1,0 +1,164 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import { useT, localizePath, formatDate, type Lang } from '../i18n/ui';
+import { getLegal } from '../lib/content';
+
+interface Props {
+  lang: Lang;
+  doc: 'terms' | 'privacy';
+}
+const { lang, doc } = Astro.props;
+const t = useT(lang);
+const entry = await getLegal(lang, doc);
+const { Content, headings } = await render(entry);
+const toc = headings.filter((h) => h.depth === 2);
+const other = doc === 'terms' ? 'privacy' : 'terms';
+---
+
+<BaseLayout lang={lang} title={entry.data.title} description={entry.data.summary}>
+  <article class="page">
+    <div class="container grid">
+      <header class="head">
+        <h1 class="enter">{entry.data.title}</h1>
+        <p class="secondary enter" style="--i:1">{entry.data.summary}</p>
+        <p class="updated muted enter" style="--i:2">
+          {t('legal.updated')} <time class="mono" datetime={entry.data.updated.toISOString().slice(0, 10)}>{formatDate(entry.data.updated, lang)}</time>
+        </p>
+      </header>
+
+      <nav class="toc" aria-label={entry.data.title}>
+        <ol>
+          {
+            toc.map((h) => (
+              <li>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))
+          }
+        </ol>
+        <a class="other" href={localizePath(lang, `/${other}/`)}>{t(`footer.${other}`)}</a>
+      </nav>
+
+      <div class="prose">
+        <Content />
+      </div>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page {
+    padding-block: var(--s-16) var(--s-24);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 240px minmax(0, var(--prose));
+    column-gap: var(--s-16);
+    align-items: start;
+  }
+
+  .head {
+    grid-column: 1 / -1;
+    max-width: 760px;
+    margin-bottom: var(--s-12);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 1.4rem + 2vw, 2.5rem);
+    letter-spacing: -0.02em;
+  }
+
+  .head p {
+    margin-top: var(--s-3);
+    font-size: var(--fs-18);
+  }
+
+  .head .updated {
+    font-size: var(--fs-13);
+    margin-top: var(--s-4);
+  }
+
+  .toc {
+    position: sticky;
+    top: calc(60px + var(--s-8));
+    font-size: var(--fs-13);
+  }
+
+  .toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 var(--s-4);
+    border-left: 1px solid var(--line);
+  }
+
+  .toc li a {
+    display: block;
+    padding: var(--s-1) var(--s-4);
+    color: var(--text-2);
+    text-decoration: none;
+    line-height: 1.5;
+  }
+
+  .toc li a:hover {
+    color: var(--text);
+  }
+
+  .other {
+    display: inline-block;
+    margin-top: var(--s-4);
+    padding-left: var(--s-4);
+    color: var(--text-3);
+  }
+
+  .prose {
+    font-size: var(--fs-16);
+    line-height: 1.75;
+    color: var(--text-2);
+  }
+
+  .prose :global(h2) {
+    margin: var(--s-12) 0 var(--s-3);
+    font-size: var(--fs-20);
+    color: var(--text);
+    scroll-margin-top: calc(60px + var(--s-6));
+  }
+
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+  }
+
+  .prose :global(p + p),
+  .prose :global(ul),
+  .prose :global(p + ul) {
+    margin-top: var(--s-3);
+  }
+
+  .prose :global(ul) {
+    padding-left: var(--s-5);
+  }
+
+  .prose :global(li + li) {
+    margin-top: var(--s-2);
+  }
+
+  .prose :global(strong) {
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .prose :global(a) {
+    color: var(--accent);
+  }
+
+  @media (max-width: 880px) {
+    .grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .toc {
+      position: static;
+      margin-bottom: var(--s-10);
+    }
+  }
+</style>

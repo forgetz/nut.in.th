@@ -1,0 +1,170 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Hero from '../../components/Hero.astro';
+import ProjectList from '../../components/ProjectList.astro';
+import Icon from '../../components/Icon.astro';
+import GalleryGrid from '../../components/GalleryGrid.astro';
+import { getGallery } from '../../lib/gallery';
+import { langs, useT, localizePath, site, type Lang } from '../../i18n/ui';
+import { getProjects } from '../../lib/content';
+
+export function getStaticPaths() {
+  return langs.map((lang) => ({ params: { lang } }));
+}
+
+const lang = Astro.params.lang as Lang;
+const t = useT(lang);
+const projects = await getProjects(lang);
+const featured = projects.filter((p) => p.data.featured).slice(0, 4);
+const shown = featured.length ? featured : projects.slice(0, 4);
+const gallery = getGallery(lang);
+---
+
+<BaseLayout lang={lang}>
+  <Hero lang={lang} />
+
+  <section class="section" id="work" aria-labelledby="work-title">
+    <div class="container">
+      <div class="section-head">
+        <h2 id="work-title" class="section-title">{t('work.title')}</h2>
+        <a class="all" href={localizePath(lang, '/work/')}>
+          {t('work.all')}
+          <span class="mono muted">{projects.length}</span>
+        </a>
+      </div>
+      <ProjectList lang={lang} projects={shown} />
+    </div>
+  </section>
+
+  {
+    gallery.length > 0 && (
+      <section class="section" id="gallery" aria-labelledby="gallery-title">
+        <div class="container">
+          <div class="section-head">
+            <h2 id="gallery-title" class="section-title">{t('gallery.latest')}</h2>
+            <a class="all" href={localizePath(lang, '/gallery/')}>
+              {t('gallery.all')}
+              <span class="mono muted">{gallery.length}</span>
+            </a>
+          </div>
+          <GalleryGrid lang={lang} items={gallery.slice(0, 6)} />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section" id="about" aria-labelledby="about-title">
+    <div class="container split">
+      <h2 id="about-title" class="section-title">{t('about.title')}</h2>
+      <p class="body">{t('about.body')}</p>
+    </div>
+  </section>
+
+  <section class="section" id="contact" aria-labelledby="contact-title">
+    <div class="container split">
+      <h2 id="contact-title" class="section-title">{t('contact.title')}</h2>
+      <div class="body">
+        <p>{t('contact.body')}</p>
+        <div class="contact-actions">
+          <a class="btn btn-primary" href={`mailto:${site.email}`}>
+            <Icon name="mail" />
+            {t('contact.email')}
+          </a>
+          <span class="mono muted email">{site.email}</span>
+        </div>
+        <ul class="links" role="list">
+          {
+            site.github && (
+              <li>
+                <a href={site.github} rel="me noopener" target="_blank">
+                  <Icon name="github" size={16} />
+                  GitHub
+                </a>
+              </li>
+            )
+          }
+          {
+            site.linkedin && (
+              <li>
+                <a href={site.linkedin} rel="me noopener" target="_blank">
+                  <Icon name="linkedin" size={16} />
+                  LinkedIn
+                </a>
+              </li>
+            )
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .all {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    font-size: var(--fs-15);
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  .all:hover {
+    color: var(--text);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--s-8);
+    align-items: baseline;
+  }
+
+  .body {
+    max-width: var(--prose);
+    font-size: var(--fs-18);
+    line-height: 1.7;
+    color: var(--text-2);
+  }
+
+  .contact-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s-4);
+    margin-top: var(--s-8);
+  }
+
+  .email {
+    font-size: var(--fs-13);
+  }
+
+  .links {
+    display: flex;
+    gap: var(--s-6);
+    list-style: none;
+    padding: 0;
+    margin: var(--s-6) 0 0;
+    font-size: var(--fs-15);
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  .links a:hover {
+    color: var(--text);
+  }
+
+  @media (max-width: 720px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+    }
+    .body {
+      font-size: var(--fs-16);
+    }
+  }
+</style>
