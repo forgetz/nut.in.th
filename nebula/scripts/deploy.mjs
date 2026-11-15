@@ -12,6 +12,13 @@ const envFile = path.join(root, '.env');
 if (existsSync(envFile)) process.loadEnvFile(envFile);
 
 const { FTP_HOST, FTP_USER, FTP_PASS, FTP_DIR = '/', FTP_SECURE = 'true' } = process.env;
+// FTP_SECURE: true = explicit FTPS (AUTH TLS), implicit = implicit FTPS (usually port 990), false = plain FTP
+const secure = FTP_SECURE === 'implicit' ? 'implicit' : FTP_SECURE === 'true';
+const FTP_PORT = Number(process.env.FTP_PORT || (secure === 'implicit' ? 990 : 21));
+if (!Number.isInteger(FTP_PORT) || FTP_PORT < 1 || FTP_PORT > 65535) {
+  console.error(`FTP_PORT must be a number between 1 and 65535 (got "${process.env.FTP_PORT}")`);
+  process.exit(1);
+}
 const missing = Object.entries({ FTP_HOST, FTP_USER, FTP_PASS }).filter(([, v]) => !v).map(([k]) => k);
 if (missing.length) {
   console.error(`Missing in .env: ${missing.join(', ')}  (copy .env.example to .env and fill it in)`);
@@ -32,26 +39,34 @@ if (!existsSync(path.join(dist, 'index.html'))) {
 const client = new Client(30_000);
 client.ftp.verbose = false;
 try {
-  console.log(`Connecting to ${FTP_HOST} as ${FTP_USER}…`);
+  console.log(`Connecting to ${FTP_HOST}:${FTP_PORT} as ${FTP_USER} (${secure === 'implicit' ? 'implicit FTPS' : secure ? 'FTPS' : 'plain FTP'})…`);
   await client.access({
     host: FTP_HOST,
+    port: FTP_PORT,
     user: FTP_USER,
     password: FTP_PASS,
-    secure: FTP_SECURE === 'true',
+    secure,
     secureOptions: { servername: FTP_HOST },
   });
-  let files = 0;
+  const files = new Set();
   client.trackProgress((info) => {
-    if (info.type === 'upload' && info.bytes === 0) return;
-    if (info.type === 'upload') files++;
+    if (info.type === 'upload') files.add(info.name);
   });
   console.log(`Uploading dist/ -> ${FTP_DIR}`);
   await client.ensureDir(FTP_DIR);
   await client.uploadFromDir(dist);
   client.trackProgress();
-  console.log(`Done. Uploaded ${files} files. Visit https://nut.in.th/`);
+  console.log(`Done. Uploaded ${files.size} files. Visit https://nut.in.th/`);
 } catch (err) {
-  console.error('Deploy failed:', err.message);
+  const detail = [err.code, err.message].filter(Boolean).join(' ') || String(err);
+  console.error(`Deploy failed: ${detail}`);
+  if (/timeout|ETIMEDOUT|control socket/i.test(detail) || !err.message?.trim()) {
+    console.error(`Hint: ${FTP_HOST}:${FTP_PORT} did not answer. If the domain is behind Cloudflare, use the hosting server's own FTP host name, and check FTP_PORT.`);
+  } else if (/certificate|altnames|self.signed/i.test(detail)) {
+    console.error('Hint: the TLS certificate does not match FTP_HOST. Use the host name shown in your hosting panel.');
+  } else if (/530|login/i.test(detail)) {
+    console.error('Hint: login was refused. Check FTP_USER and FTP_PASS.');
+  }
   process.exitCode = 1;
 } finally {
   client.close();

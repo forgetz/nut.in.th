@@ -65,7 +65,7 @@ Images are re-encoded to WebP at build time, which also strips the ComfyUI promp
 
 ## Deploying
 
-1. Copy `.env.example` to `.env` (git-ignored) and fill in `FTP_HOST`, `FTP_USER`, `FTP_PASS`, `FTP_DIR`.
+1. Copy `.env.example` to `.env` (git-ignored) and fill in `FTP_HOST`, `FTP_PORT`, `FTP_USER`, `FTP_PASS`, `FTP_DIR`, `FTP_SECURE`. nut.in.th is behind Cloudflare, which does not pass FTP: use the FTP host name from the hosting panel.
 2. `npm run deploy`.
 
 The upload adds and overwrites files; it never deletes anything on the server. If old PHP files (e.g. `index.php`) are still in the web root, the included `.htaccess` sets `DirectoryIndex index.html` so the new site wins. Remove the old files from the server when you no longer need them.
