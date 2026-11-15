@@ -1,0 +1,135 @@
+---
+// Layout for the NebulaStudio info pages. Uses the NebulaStudio name only, so the
+// page name matches the Google OAuth consent screen. No language redirect, no login.
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/500.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '../styles/global.css';
+import { studio } from '../data/nebula-studio';
+
+interface Props {
+  title?: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} · ${studio.name}` : `${studio.name} — ${studio.tagline}`;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="application-name" content={studio.name} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={studio.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+  </head>
+  <body>
+    <header class="bar-wrap">
+      <div class="container bar">
+        <a class="name" href={studio.home}>
+          <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+            <rect x="1" y="1" width="18" height="18" rx="5" fill="currentColor"></rect>
+            <path d="M8 6.5v7l5.5-3.5z" fill="var(--page)"></path>
+          </svg>
+          {studio.name}
+        </a>
+        <nav aria-label={studio.name}>
+          <a href={studio.privacy}>Privacy</a>
+          <a href={studio.terms}>Terms</a>
+          <a class="btn btn-primary btn-sm" href={studio.appUrl}>Open app</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="foot">
+      <div class="container row">
+        <p class="muted">
+          <span class="mono">© {year}</span> {studio.name} by {studio.developer}
+        </p>
+        <nav aria-label="Legal">
+          <a href={studio.home}>About {studio.name}</a>
+          <a href={studio.privacy}>Privacy policy</a>
+          <a href={studio.terms}>Terms of service</a>
+          <a href={`mailto:${studio.email}`}>{studio.email}</a>
+          <a href="/th/" lang="th">nut.in.th</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .bar-wrap {
+    border-bottom: 1px solid var(--line);
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-4);
+    height: 60px;
+  }
+  .name {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    font-size: var(--fs-18);
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .bar nav {
+    display: flex;
+    align-items: center;
+    gap: var(--s-4);
+    font-size: var(--fs-15);
+  }
+  .bar nav a:not(.btn) {
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  .bar nav a:not(.btn):hover {
+    color: var(--text);
+  }
+  .foot {
+    border-top: 1px solid var(--line);
+    padding-block: var(--s-8);
+    font-size: var(--fs-13);
+  }
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s-3) var(--s-8);
+  }
+  .foot nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-6);
+  }
+  .foot nav a {
+    color: var(--text-2);
+    text-decoration: none;
+  }
+  .foot nav a:hover {
+    color: var(--text);
+  }
+  @media (max-width: 560px) {
+    .bar nav a:not(.btn) {
+      display: none;
+    }
+  }
+</style>

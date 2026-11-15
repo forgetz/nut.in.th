@@ -41,6 +41,8 @@ Under the PDPA you may request access to, a copy of, correction, deletion, restr
 
 Links to other sites, such as GitHub, are covered by those sites' own privacy policies. Fonts and images on this site are served from our own server, so opening a page makes no requests to outside services.
 
+NebulaStudio (nebula.nut.in.th), which signs in with Google and uses YouTube, has its own [NebulaStudio privacy policy](/nebula-studio/privacy/).
+
 ## Changes
 
 We may update this policy. The last-updated date is shown at the top of this page.

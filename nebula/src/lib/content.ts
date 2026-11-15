@@ -13,7 +13,7 @@ export async function getProjects(lang: Lang): Promise<Project[]> {
     .sort((a, b) => b.data.year - a.data.year || a.data.title.localeCompare(b.data.title));
 }
 
-export async function getLegal(lang: Lang, doc: 'terms' | 'privacy') {
+export async function getLegal(lang: Lang, doc: string) {
   const all = await getCollection('legal', (e) => e.id === `${lang}/${doc}`);
   const entry = all[0];
   if (!entry) throw new Error(`Missing legal page: ${lang}/${doc}.md`);

@@ -1,0 +1,304 @@
+---
+// Public home page for NebulaStudio — the "Application home page" in Google Cloud Console.
+// Everything here is plain HTML: no login, no redirect, readable without JavaScript.
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import Icon from '../../components/Icon.astro';
+import { studio, scopes, limitedUse } from '../../data/nebula-studio';
+
+const purpose = 'NebulaStudio helps you prepare YouTube Shorts and publish them to your own YouTube channel';
+
+const steps = [
+  { title: 'Sign in with Google', body: 'Use the Google account the owner has added to NebulaStudio. Other accounts cannot sign in.' },
+  { title: 'Choose your YouTube channel', body: 'Give NebulaStudio permission to upload to your channel and to read its playlists and video status.' },
+  { title: 'Prepare your Shorts', body: 'Add the video, title, description and playlist for each Short, and pick when it should go out.' },
+  { title: 'Publish and track', body: 'NebulaStudio uploads each Short to your channel and shows whether it is processing, published or failed.' },
+];
+---
+
+<StudioLayout description={`${purpose}. Information about the app, the Google data it uses, and its privacy policy.`}>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow mono muted">{studio.tagline}</p>
+      <h1>{studio.name}</h1>
+      <p class="lead">{purpose}</p>
+      <div class="actions">
+        <a class="btn btn-primary" href={studio.appUrl}>
+          Open {studio.name}
+          <Icon name="arrow-right" />
+        </a>
+        <a class="btn btn-quiet" href={studio.privacy}>Privacy policy</a>
+      </div>
+      <p class="note muted">
+        {studio.name} is a private tool run by {studio.developer}. It is available only to Google accounts the owner has approved.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="how">
+    <div class="container">
+      <h2 id="how" class="section-title">What {studio.name} does</h2>
+      <ol class="steps" role="list">
+        {
+          steps.map((s, i) => (
+            <li>
+              <span class="num mono muted">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{s.title}</h3>
+              <p class="secondary">{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="data">
+    <div class="container">
+      <h2 id="data" class="section-title">Google data {studio.name} uses</h2>
+      <p class="intro secondary">
+        {studio.name} asks for these Google permissions when you sign in. It uses them only for the features above, only for your own account and channel.
+      </p>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Permission</th>
+              <th scope="col">What it accesses</th>
+              <th scope="col">Why {studio.name} needs it</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              scopes.map((s) => (
+                <tr>
+                  <th scope="row">
+                    {s.scope}
+                    <span class="mono muted url">{s.url}</span>
+                  </th>
+                  <td>{s.what}</td>
+                  <td>{s.why}</td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <ul class="promises" role="list">
+        <li>{studio.name} does not sell your data or share it with anyone</li>
+        <li>It does not use your Google data for advertising or to train AI models</li>
+        <li>It never uploads anything to your channel unless you ask it to</li>
+        <li>
+          You can remove its access at any time at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>
+        </li>
+      </ul>
+
+      <p class="limited">
+        {limitedUse.split('Google API Services User Data Policy')[0]}<a href="https://developers.google.com/terms/api-services-user-data-policy"
+          >Google API Services User Data Policy</a
+        >{limitedUse.split('Google API Services User Data Policy')[1]}
+      </p>
+      <p class="secondary small">
+        {studio.name} uses YouTube API Services. By using it you agree to the <a href="https://www.youtube.com/t/terms">YouTube Terms of Service</a>, and Google's
+        handling of your data is described in the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="contact">
+    <div class="container split">
+      <h2 id="contact" class="section-title">Contact</h2>
+      <div>
+        <p class="secondary">
+          Questions about {studio.name}, or a request to delete your data: <a href={`mailto:${studio.email}`}>{studio.email}</a>
+        </p>
+        <p class="links">
+          <a href={studio.privacy}>Privacy policy</a>
+          <a href={studio.terms}>Terms of service</a>
+          <a href={studio.appUrl}>{studio.appHost}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</StudioLayout>
+
+<style>
+  .hero {
+    padding-block: var(--s-20) var(--s-16);
+  }
+  .eyebrow {
+    font-size: var(--fs-13);
+    margin-bottom: var(--s-4);
+  }
+  h1 {
+    font-size: var(--fs-hero);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+  }
+  .lead {
+    margin-top: var(--s-6);
+    max-width: 40ch;
+    font-size: clamp(1.125rem, 1rem + 0.6vw, 1.375rem);
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+    margin-top: var(--s-8);
+  }
+  .note {
+    margin-top: var(--s-6);
+    max-width: 60ch;
+    font-size: var(--fs-15);
+  }
+
+  h2.section-title {
+    margin-bottom: var(--s-6);
+  }
+
+  .steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: var(--s-4);
+  }
+  .steps li {
+    padding: var(--s-6);
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+    background: var(--card);
+  }
+  .num {
+    font-size: var(--fs-13);
+  }
+  .steps h3 {
+    margin-top: var(--s-3);
+    font-size: var(--fs-18);
+  }
+  .steps p {
+    margin-top: var(--s-2);
+    font-size: var(--fs-15);
+    line-height: 1.55;
+  }
+
+  .intro {
+    max-width: var(--prose);
+    margin-bottom: var(--s-6);
+  }
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-card);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--fs-15);
+    line-height: 1.5;
+  }
+  th,
+  td {
+    padding: var(--s-4) var(--s-5);
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+  thead th {
+    font-size: var(--fs-13);
+    font-weight: 500;
+    color: var(--text-3);
+    background: var(--raised);
+  }
+  tbody th {
+    font-weight: 500;
+    min-width: 180px;
+  }
+  td {
+    color: var(--text-2);
+  }
+  .url {
+    display: block;
+    margin-top: var(--s-1);
+    font-size: var(--fs-12);
+    font-weight: 400;
+    word-break: break-all;
+  }
+
+  .promises {
+    margin: var(--s-8) 0 0;
+    padding-left: var(--s-5);
+    max-width: var(--prose);
+    color: var(--text-2);
+  }
+  .promises li + li {
+    margin-top: var(--s-2);
+  }
+  .limited {
+    margin-top: var(--s-8);
+    max-width: var(--prose);
+    padding: var(--s-5) var(--s-6);
+    border-left: 2px solid var(--accent);
+    background: var(--card);
+    border-radius: 0 var(--r-control) var(--r-control) 0;
+  }
+  .small {
+    margin-top: var(--s-4);
+    max-width: var(--prose);
+    font-size: var(--fs-15);
+  }
+  section a:not(.btn) {
+    color: var(--accent);
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: var(--s-8);
+    align-items: baseline;
+  }
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-6);
+    margin-top: var(--s-4);
+  }
+  /* Permissions table becomes stacked cards on phones */
+  @media (max-width: 640px) {
+    thead {
+      display: none;
+    }
+    table,
+    tbody,
+    tr,
+    th,
+    td {
+      display: block;
+    }
+    tbody tr {
+      padding: var(--s-4) var(--s-5);
+      border-bottom: 1px solid var(--line);
+    }
+    tbody th,
+    td {
+      padding: 0;
+      border: 0;
+      min-width: 0;
+    }
+    td {
+      margin-top: var(--s-2);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .split {
+      grid-template-columns: 1fr;
+      gap: var(--s-4);
+    }
+  }
+</style>

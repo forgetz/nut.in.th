@@ -26,7 +26,7 @@ const t = useT(lang);
         {
           subSites.map((s, i) => (
             <li class="enter" style={`--i:${Math.min(i + 2, 5)}`}>
-              <a class="site" href={`https://${s.host}/`} rel="noopener">
+              <a class="site" href={s.href ?? `https://${s.host}/`} rel="noopener">
                 <span class="top">
                   <span class="name">{s.name}</span>
                   <Icon name="arrow-up-right" class="arrow" />

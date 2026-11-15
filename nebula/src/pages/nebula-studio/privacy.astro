@@ -1,0 +1,12 @@
+---
+import StudioLayout from '../../layouts/StudioLayout.astro';
+import LegalDoc from '../../components/LegalDoc.astro';
+import { getLegal } from '../../lib/content';
+import { studio } from '../../data/nebula-studio';
+
+const entry = await getLegal('en', 'nebula-studio-privacy');
+---
+
+<StudioLayout title="Privacy policy" description={entry.data.summary}>
+  <LegalDoc lang="en" entry={entry} other={{ href: studio.terms, label: 'Terms of service' }} />
+</StudioLayout>
